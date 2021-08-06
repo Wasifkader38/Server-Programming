@@ -1,4 +1,6 @@
-const { response } = require("../app");
+const {
+  response
+} = require("../app");
 const MathOlympiad = require("../models/MathOlympiad.model")
 
 const getMO = (req, res) => {
@@ -74,102 +76,164 @@ const postMO = (req, res) => {
 }
 
 const getMOList = (req, res) => {
-  
-    let all_participant=[];
-    let error="";
-    MathOlympiad.find()
-    .then((data)=>{
-        all_participant=data;
-        res.render("math-olympiad/list.ejs",{
-            error: req.flash("error"),
-            participants: all_participant,
-        });
+
+  let all_participant = [];
+  let error = "";
+  MathOlympiad.find()
+    .then((data) => {
+      all_participant = data;
+      res.render("math-olympiad/list.ejs", {
+        error: req.flash("error"),
+        participants: all_participant,
+      });
 
     })
-    .catch(()=>{
-        error="Failed to fetch data!";
-        res.render("math-olympiad/list.ejs",{
-            error:req.flash("error",error),
-            participants:all_participant,
-        });
+    .catch(() => {
+      error = "Failed to fetch data!";
+      res.render("math-olympiad/list.ejs", {
+        error: req.flash("error", error),
+        participants: all_participant,
+      });
     });
 
 };
 
 const deleteMO = (req, res) => {
-    let error = '';
-    const id = req.params.id;
-  
-    MathOlympiad.deleteOne({ _id: req.params.id })
-      .then(() => {
-        let error = 'Data has been deleted successfully';
-        req.flash('error', error);
-        res.redirect('/MathOlympiad/list');
-      })
-      .catch(() => {
-        let error = 'Failed to delete data';
-        req.flash('error', error);
-        res.redirect('/MathOlympiad/list');
-      });
-  };
+  let error = '';
+  const id = req.params.id;
 
-  const paymentDoneMO = (req, res) => {
-    const id = req.params.id;
-  
-    MathOlympiad.findOne({ _id: id })
-      .then((participant) => {
-        participant.paid = participant.total;
-        participant
-          .save()
-          .then(() => {
-            let error = 'Payment completed successfully';
-            req.flash('error', error);
-            res.redirect('/MathOlympiad/list');
-          })
-          .catch(() => {
-            let error = 'Data could not be updated';
-            req.flash('error', error);
-            res.redirect('/MathOlympiad/list');
-          });
-      })
-      .catch(() => {
-        let error = 'Data could not be updataed';
-        req.flash('error', error);
-        res.redirect('/MathOlympiad/list');
+  MathOlympiad.deleteOne({
+      _id: req.params.id
+    })
+    .then(() => {
+      let error = 'Data has been deleted successfully';
+      req.flash('error', error);
+      res.redirect('/MathOlympiad/list');
+    })
+    .catch(() => {
+      let error = 'Failed to delete data';
+      req.flash('error', error);
+      res.redirect('/MathOlympiad/list');
+    });
+};
+
+const paymentDoneMO = (req, res) => {
+  const id = req.params.id;
+
+  MathOlympiad.findOne({
+      _id: id
+    })
+    .then((participant) => {
+      participant.paid = participant.total;
+      participant
+        .save()
+        .then(() => {
+          let error = 'Payment completed successfully';
+          req.flash('error', error);
+          res.redirect('/MathOlympiad/list');
+        })
+        .catch(() => {
+          let error = 'Data could not be updated';
+          req.flash('error', error);
+          res.redirect('/MathOlympiad/list');
+        });
+    })
+    .catch(() => {
+      let error = 'Data could not be updataed';
+      req.flash('error', error);
+      res.redirect('/MathOlympiad/list');
+    });
+};
+
+const selectMO = (req, res) => {
+  const id = req.params.id;
+
+  MathOlympiad.findOne({
+      _id: id
+    })
+    .then((participant) => {
+      participant.selected = true;
+      participant
+        .save()
+        .then(() => {
+          let error = 'Participant has been selected successfully';
+          req.flash('error', error);
+          res.redirect('/MathOlympiad/list');
+        })
+        .catch(() => {
+          let error = 'Data could not be updated';
+          req.flash('error', error);
+          res.redirect('/MathOlympiad/list');
+        });
+    })
+    .catch(() => {
+      let error = 'Data could not be updataed';
+      req.flash('error', error);
+      res.redirect('/MathOlympiad/list');
+    });
+};
+
+const getEditParticipant = (req, res) => {
+  const id = req.params.id;
+  let participant = [];
+  let error = "";
+  MathOlympiad.findOne({
+      _id: id
+    })
+    .then((data) => {
+      participant = data;
+      res.render("math-olympiad/editParticipant.ejs", {
+        error: req.flash("error"),
+        participant: participant,
       });
-  };
-  
-  const selectMO = (req, res) => {
-    const id = req.params.id;
-  
-    MathOlympiad.findOne({ _id: id })
-      .then((participant) => {
-        participant.selected = true;
-        participant
-          .save()
-          .then(() => {
-            let error = 'Participant has been selected successfully';
-            req.flash('error', error);
-            res.redirect('/MathOlympiad/list');
-          })
-          .catch(() => {
-            let error = 'Data could not be updated';
-            req.flash('error', error);
-            res.redirect('/MathOlympiad/list');
-          });
-      })
-      .catch(() => {
-        let error = 'Data could not be updataed';
-        req.flash('error', error);
-        res.redirect('/MathOlympiad/list');
+    })
+    .catch((err) => {
+      error = "Unexpected error occured";
+      res.render("math-olympiad/editParticipant.ejs", {
+        error: req.flash("error",error),
       });
-  };
-  
-  module.exports = {
-    getMO,
-    postMO,
-    getMOList,
-    deleteMO,
-    paymentDoneMO,
-    selectMO,
-  };
+    });
+};
+
+const postEditParticipant = async (req, res) => {
+  const {
+    name,
+    contact,
+    institute,
+    category,
+    email,
+    tshirt
+  } = req.body;
+
+  MathOlympiad.findOneAndUpdate({
+      name: name,
+      contact: contact
+    }, {
+      category,
+      email,
+      institute,
+      tshirt
+    })
+    .then((data) => {
+      let error = "Participant Data Updated Succesfully";
+      req.flash("error", error);
+      res.redirect("/MathOlympiad/list");
+    })
+    .catch((err) => {
+      let error = "Unexpected error occured";
+      req.flash("error", error);
+      res.redirect("/MathOlympiad/list");
+    });
+};
+
+
+module.exports = {
+  getMO,
+  postMO,
+  getMOList,
+  deleteMO,
+  paymentDoneMO,
+  selectMO,
+  getEditParticipant,
+  postEditParticipant,
+};
